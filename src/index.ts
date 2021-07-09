@@ -229,6 +229,27 @@ class VimCell {
         {}, //args
         { context: 'insert', toKeys: '<Esc>' } //extra
       );
+      //MOVE BETWEEN CELLS WHEN IN NORMAL MODE
+      lvim.defineAction('selectBelowExecuteMarkdown', (cm: any, actionArgs: any) => {
+        commands.execute('select-below-execute-markdown');
+      });
+      lvim.mapCommand(
+          ']',
+          'action',
+          'selectBelowExecuteMarkdown',
+          {},
+          { context: 'normal'}
+      )
+      lvim.defineAction('selectAboveExecuteMarkdown', (cm: any, actionArgs: any) => {
+        commands.execute('select-above-execute-markdown');
+      });
+      lvim.mapCommand(
+          '[',
+          'action',
+          'selectAboveExecuteMarkdown',
+          {},
+          { context: 'normal'}
+      )
     }
   }
 
@@ -286,6 +307,10 @@ async function setupPlugin(
         const { context, content } = current;
         NotebookActions.run(content, context.sessionContext);
         current.content.mode = 'edit';
+        if (content.activeCell !== null) { //CUSTOM
+          const editor = content.activeCell.editor as CodeMirrorEditor;
+          (CodeMirror as any).Vim.handleKey(editor.editor, '<Esc>');
+        }
       }
     },
     isEnabled
@@ -690,19 +715,9 @@ async function setupPlugin(
   //    Run cell and next: Cmd + ]
   //    Toggle between jupyter edit mode: Enter
   commands.addKeyBinding({
-    selector: '.jp-Notebook.jp-mod-editMode',
-    keys: [']'],
-    command: 'select-below-execute-markdown'
-  });
-  commands.addKeyBinding({
     selector: '.jp-Notebook:focus',
     keys: [']'],
     command: 'notebook:move-cursor-down'
-  });
-  commands.addKeyBinding({
-    selector: '.jp-Notebook.jp-mod-editMode',
-    keys: ['['],
-    command: 'select-above-execute-markdown'
   });
   commands.addKeyBinding({
     selector: '.jp-Notebook:focus',
@@ -712,24 +727,20 @@ async function setupPlugin(
   commands.addKeyBinding({
     selector: '.jp-Notebook.jp-mod-editMode',
     keys: ['Accel ['],
-    // keys: [';', ';'],
     command: 'run-cell-and-edit'
   });
   commands.addKeyBinding({
     selector: '.jp-Notebook:focus',
-    // keys: [';', ';'],
     keys: ['Accel ['],
     command: 'notebook:run-cell'
   });
   commands.addKeyBinding({
     selector: '.jp-Notebook.jp-mod-editMode',
-    // keys: [';', ']'],
     keys: ['Accel ]'],
     command: 'run-select-next-edit'
   });
   commands.addKeyBinding({
     selector: '.jp-Notebook:focus',
-    // keys: [';', ']'],
     keys: ['Accel ]'],
     command: 'notebook:run-cell-and-select-next'
   });
