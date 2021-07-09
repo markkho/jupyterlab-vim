@@ -190,6 +190,15 @@ class VimCell {
         { context: 'normal' }
       );
 
+      //CUSTOM MAPPING TO EXIT INSERT MODE
+      lvim.mapCommand(
+        'jk', //keys
+        'keyToKey', //type
+        '', //name assigned to type
+        {}, //args
+        { context: 'insert', toKeys: '<Esc>' } //extra
+      );
+
       lvim.defineAction('moveCellDown', (cm: any, actionArgs: any) => {
         commands.execute('notebook:move-cell-down');
       });
