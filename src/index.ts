@@ -190,15 +190,6 @@ class VimCell {
         { context: 'normal' }
       );
 
-      //CUSTOM MAPPING TO EXIT INSERT MODE
-      lvim.mapCommand(
-        'jk', //keys
-        'keyToKey', //type
-        '', //name assigned to type
-        {}, //args
-        { context: 'insert', toKeys: '<Esc>' } //extra
-      );
-
       lvim.defineAction('moveCellDown', (cm: any, actionArgs: any) => {
         commands.execute('notebook:move-cell-down');
       });
@@ -216,7 +207,28 @@ class VimCell {
       lvim.defineAction('splitCell', (cm: any, actionArgs: any) => {
         commands.execute('notebook:split-cell-at-cursor');
       });
-      lvim.mapCommand('-', 'action', 'splitCell', {}, { extra: 'normal' });
+      // lvim.mapCommand('-', 'action', 'splitCell', {}, { extra: 'normal' }); //CUSTOM
+
+      //CUSTOM MAPPINGS
+      //EXIT NORMAL MODE TO JUPYER COMMAND MODE
+      lvim.defineAction('enterCommandMode', (cm: any, actionArgs: any) => {
+        commands.execute('notebook:enter-command-mode');
+      });
+      lvim.mapCommand(
+          '<CR>',
+          'action',
+          'enterCommandMode',
+          {},
+          { context: 'normal'}
+      )
+      //EXIT INSERT MODE
+      lvim.mapCommand(
+        'jk', //keys
+        'keyToKey', //type
+        '', //name assigned to type
+        {}, //args
+        { context: 'insert', toKeys: '<Esc>' } //extra
+      );
     }
   }
 
@@ -669,6 +681,53 @@ async function setupPlugin(
       '.jp-Notebook.jp-mod-editMode .jp-InputArea-editor:not(.jp-mod-has-primary-selection)',
     keys: ['Ctrl G'],
     command: 'tooltip:launch-notebook'
+  });
+  //CUSTOM
+  // Custom inter-cell navigation:
+  //    Next cell: ]
+  //    Prev cell: [
+  //    Run cell: ; + ;
+  //    Run cell and next: ; + ]
+  //    Toggle between jupyter edit mode: Enter
+  commands.addKeyBinding({
+    selector: '.jp-Notebook.jp-mod-editMode',
+    keys: [']'],
+    command: 'select-below-execute-markdown'
+  });
+  commands.addKeyBinding({
+    selector: '.jp-Notebook:focus',
+    keys: [']'],
+    command: 'notebook:move-cursor-down'
+  });
+  commands.addKeyBinding({
+    selector: '.jp-Notebook.jp-mod-editMode',
+    keys: ['['],
+    command: 'select-above-execute-markdown'
+  });
+  commands.addKeyBinding({
+    selector: '.jp-Notebook:focus',
+    keys: ['['],
+    command: 'notebook:move-cursor-up'
+  });
+  commands.addKeyBinding({
+    selector: '.jp-Notebook.jp-mod-editMode',
+    keys: [';', ';'],
+    command: 'run-cell-and-edit'
+  });
+  commands.addKeyBinding({
+    selector: '.jp-Notebook:focus',
+    keys: [';', ';'],
+    command: 'notebook:run-cell'
+  });
+  commands.addKeyBinding({
+    selector: '.jp-Notebook.jp-mod-editMode',
+    keys: [';', ']'],
+    command: 'run-select-next-edit'
+  });
+  commands.addKeyBinding({
+    selector: '.jp-Notebook:focus',
+    keys: [';', ']'],
+    command: 'notebook:run-cell-and-select-next'
   });
 
   // tslint:disable:no-unused-expression
