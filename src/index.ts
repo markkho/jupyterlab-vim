@@ -686,8 +686,8 @@ async function setupPlugin(
   // Custom inter-cell navigation:
   //    Next cell: ]
   //    Prev cell: [
-  //    Run cell: ; + ;
-  //    Run cell and next: ; + ]
+  //    Run cell: Cmd + [
+  //    Run cell and next: Cmd + ]
   //    Toggle between jupyter edit mode: Enter
   commands.addKeyBinding({
     selector: '.jp-Notebook.jp-mod-editMode',
@@ -711,22 +711,26 @@ async function setupPlugin(
   });
   commands.addKeyBinding({
     selector: '.jp-Notebook.jp-mod-editMode',
-    keys: [';', ';'],
+    keys: ['Accel ['],
+    // keys: [';', ';'],
     command: 'run-cell-and-edit'
   });
   commands.addKeyBinding({
     selector: '.jp-Notebook:focus',
-    keys: [';', ';'],
+    // keys: [';', ';'],
+    keys: ['Accel ['],
     command: 'notebook:run-cell'
   });
   commands.addKeyBinding({
     selector: '.jp-Notebook.jp-mod-editMode',
-    keys: [';', ']'],
+    // keys: [';', ']'],
+    keys: ['Accel ]'],
     command: 'run-select-next-edit'
   });
   commands.addKeyBinding({
     selector: '.jp-Notebook:focus',
-    keys: [';', ']'],
+    // keys: [';', ']'],
+    keys: ['Accel ]'],
     command: 'notebook:run-cell-and-select-next'
   });
 
